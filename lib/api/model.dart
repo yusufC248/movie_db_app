@@ -1,60 +1,52 @@
-class Movie {
-
-  int? id;
-  bool? video;
-  String? title;
-  String? posterPath;
-  String? originalLanguage;
-  String? originalTitle;
-  List<int>? genreIds;
-  String? backdropPath;
-  String? overview;
-  DateTime? releaseDate;
-
-  Movie(
-      {
-        this.id,
-        this.video,
-
-        this.title,
-
-        this.posterPath,
-        this.originalLanguage,
-        this.originalTitle,
-        this.genreIds,
-        this.backdropPath,
-        this.overview,
-        this.releaseDate});
-
-  Movie.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    video = json['video'];
-
-    title = json['title'];
-
-    posterPath = json['poster_path'];
-    originalLanguage = json['original_language'];
-    originalTitle = json['original_title'];
-    genreIds = json['genre_ids'].cast<int>();
-    backdropPath = json['backdrop_path'];
-    overview = json['overview'];
-    releaseDate = DateTime.parse(json['release_date']);
+class NewMovie {
+  int? page;
+  int? totalResults;
+  int? totalPages;
+  List<Results>? results;
+  NewMovie({this.page, this.totalResults, this.totalPages, this.results});
+  NewMovie.fromJson(Map<String, dynamic> json) {
+    page = json['page'];
+    totalResults = json['total_results'];
+    totalPages = json['total_pages'];
+    if (json['results'] != null) {
+      // ignore: prefer_collection_literals, unnecessary_new, deprecated_member_use
+      results = <Results>[];
+      json['results'].forEach((v) {
+        results!.add(new Results.fromJson(v));
+      });
+    }
   }
-
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['video'] = this.video;
-
-    data['title'] = this.title;
-
+    data['page'] = this.page;
+    data['total_results'] = this.totalResults;
+    data['total_pages'] = this.totalPages;
+    if (this.results != null) {
+      data['results'] = this.results!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+class Results {
+  String? posterPath;
+  int? id;
+  String? title;
+  Results(
+      {
+        this.posterPath,
+        this.id,
+        this.title,
+      });
+  Results.fromJson(Map<String, dynamic> json) {
+    posterPath = json['poster_path'];
+    id = json['id'];
+    title = json['title'];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
     data['poster_path'] = this.posterPath;
-    data['original_language'] = this.originalLanguage;
-    data['original_title'] = this.originalTitle;
-    data['genre_ids'] = this.genreIds;
-    data['backdrop_path'] = this.backdropPath;
-    data['overview'] = this.overview;
-    data['release_date'] = this.releaseDate;
+    data['id'] = this.id;
+    data['title'] = this.title;
     return data;
   }
 }

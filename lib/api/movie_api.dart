@@ -1,40 +1,22 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
-import 'config.dart';
 import 'model.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' show Client, Response;
 
-abstract class MovieDB {
+class MovieApi{
+  String apiKey = '7c6fdfab1b9ae6b4cf6d0199fb71c8a3';
+  String baseUrl = 'https://api.themoviedb.org/3';
+  Client client = Client();
+  Future<NewMovie> getNewMovie() async{
 
-  MovieDB();
+    Uri url = Uri.parse('$baseUrl/movie/upcoming/?api_key=$apiKey');
 
-  Future<List<Movie>> upcomingMovies();
+    Response response = await client.get(url);
 
-  factory MovieDB.getInstance() => _MovieRepository();
-}
-
-class _MovieRepository extends MovieDB{
-
-  static final _MovieRepository _singleton = new _MovieRepository._internal();
-
-  factory _MovieRepository() => _singleton;
-
-  _MovieRepository._internal();
-
-  static List<Movie> _computeMovies(dynamic body) => List<Movie>.from(body.map((movie) => Movie.fromJson(movie)));
-  @override
-  Future<List<Movie>> upcomingMovies() async{
-    var url = Uri.https(MOVIE_BASE_URL, '/3/movie/upcoming',
-        { 'api_key': API_KEY,
-          'language': 'en-US'
-        });
-
-    var response = await http.get(url);
-
-    var body = json.decode(response.body);
-
-    return compute(_computeMovies, body['results']);
+    if(response.statusCode == 200){
+      return NewMovie.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception(response.statusCode);
+    }
   }
 }
